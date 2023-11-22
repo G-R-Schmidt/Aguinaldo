@@ -1,7 +1,5 @@
 import os
-
 import pandas as pd
-
 from flask import Flask, render_template, request, send_file, current_app
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
@@ -16,139 +14,136 @@ import seaborn as sns
 import numpy as np
 from io import BytesIO
 import base64
-
 from src import app
-from src.forms import MLForm
-
+from src.forms import FormularioML
 
 @app.route('/')
-def index():
-    form = MLForm()  # Crie uma instância do formulário
-    return render_template('index.html', form=form)
+def inicio():
+    formulario = FormularioML()  # Cria uma instância do formulário
+    return render_template('index.html', formulario=formulario)
 
-@app.route('/train', methods=['POST'])
-def train():
-    classifier_name = request.form.get('classifier')
-    parameters = get_parameters(request.form, classifier_name)
+@app.route('/treinar', methods=['POST'])
+def treinar():
+    nome_classificador = request.form.get('classificador')
+    parametros = obter_parametros(request.form, nome_classificador)
 
-    # Carregue o conjunto de dados Iris
+    # Carrega o conjunto de dados Iris
     iris = datasets.load_iris()
     X = iris.data
     y = iris.target
 
-    # Divida o conjunto de dados em treino e teste
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Divide o conjunto de dados em treino e teste
+    X_treino, X_teste, y_treino, y_teste = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Inicialize o classificador selecionado com os parâmetros escolhidos
-    classifier = get_classifier(classifier_name, parameters)
+    # Inicializa o classificador selecionado com os parâmetros escolhidos
+    classificador = obter_classificador(nome_classificador, parametros)
 
-    # Treine o classificador
-    classifier.fit(X_train, y_train)
+    # Treina o classificador
+    classificador.fit(X_treino, y_treino)
 
-    # Faça previsões
-    y_pred = classifier.predict(X_test)
+    # Faz previsões
+    y_predito = classificador.predict(X_teste)
 
-    # Calcule as métricas
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='macro')
-    recall = recall_score(y_test, y_pred, average='macro')
-    f1 = f1_score(y_test, y_pred, average='macro')
+    # Calcula as métricas
+    acuracia = accuracy_score(y_teste, y_predito)
+    precisao = precision_score(y_teste, y_predito, average='macro')
+    recall = recall_score(y_teste, y_predito, average='macro')
+    f1 = f1_score(y_teste, y_predito, average='macro')
 
-    # Crie a matriz de confusão
+    # Cria a matriz de confusão
     classes = iris.target_names.tolist()
-    cm = confusion_matrix(y_test, y_pred)
-    plot_confusion_matrix(cm, classes)
+    matriz_confusao = confusion_matrix(y_teste, y_predito)
+    plotar_matriz_confusao(matriz_confusao, classes)
 
-    # Converta a imagem para uma string base64
-    image_str = plot_to_base64()
+    # Converte a imagem para uma string base64
+    imagem_str = plotar_para_base64()
 
-    result = {
-        'accuracy': accuracy,
-        'precision': precision,
+    resultado = {
+        'acuracia': acuracia,
+        'precisao': precisao,
         'recall': recall,
         'f1': f1,
-        'image': image_str,
-        'confusion_matrix_path': 'static/conf_photos/confusion_matrix.png'
+        'imagem': imagem_str,
+        'caminho_matriz_confusao': 'static/conf_photos/matriz_confusao.png'
     }
 
-    return render_template('index.html', form=MLForm(), result=result)
-def get_parameters(form_data, classifier_name):
-    # Implemente a lógica para extrair os parâmetros do formulário
+    return render_template('index.html', formulario=FormularioML(), resultado=resultado)
+
+def obter_parametros(dados_formulario, nome_classificador):
+    # Implementa a lógica para extrair os parâmetros do formulário
     params = {}
     for i in range(1, 4):  # Assumindo que você tem até 3 parâmetros, ajuste conforme necessário
-        param_key = f'param{i}'
-        param_value = form_data.get(param_key)
-        params[param_key] = param_value
+        chave_param = f'parametro{i}'
+        valor_param = dados_formulario.get(chave_param)
+        params[chave_param] = valor_param
 
     # Lógica específica para cada classificador
-    if classifier_name == 'knn':
-        # Adicione lógica específica para KNN
-        params['n_neighbors'] = int(params.get('param1'))
-        params['weights'] = params.get('param2')
+    if nome_classificador == 'knn':
+        # Adiciona lógica específica para KNN
+        params['n_vizinhos'] = int(params.get('parametro1'))
+        params['pesos'] = params.get('parametro2')
 
-    elif classifier_name == 'svm':
-        # Adicione lógica específica para SVM
-        params['C'] = float(params.get('param1'))
-        params['kernel'] = params.get('param2')
+    elif nome_classificador == 'svm':
+        # Adiciona lógica específica para SVM
+        params['C'] = float(params.get('parametro1'))
+        params['kernel'] = params.get('parametro2')
 
-    elif classifier_name == 'mlp':
-        # Adicione lógica específica para MLP
-        params['hidden_layer_size'] = int(params.get('param1'))
-        params['max_iter'] = int(params.get('param2'))
+    elif nome_classificador == 'mlp':
+        # Adiciona lógica específica para MLP
+        params['tamanho_camada_oculta'] = int(params.get('parametro1'))
+        params['max_iteracoes'] = int(params.get('parametro2'))
 
-    elif classifier_name == 'dt':
-        # Adicione lógica específica para Decision Tree
-        params['max_depth'] = int(params.get('param1'))
+    elif nome_classificador == 'dt':
+        # Adiciona lógica específica para Decision Tree
+        params['max_profundidade'] = int(params.get('parametro1'))
 
-    elif classifier_name == 'rf':
-        # Adicione lógica específica para Random Forest
-        params['n_estimators'] = int(params.get('param1'))
+    elif nome_classificador == 'rf':
+        # Adiciona lógica específica para Random Forest
+        params['n_estimadores'] = int(params.get('parametro1'))
 
     return params
 
-def get_classifier(name, params):
-    # Implemente a lógica para inicializar o classificador com os parâmetros
-    if name == 'knn':
-        classifier = KNeighborsClassifier(n_neighbors=int(params['param1']))
-    elif name == 'svm':
-        classifier = SVC(C=float(params['param1']), kernel=params['param2'])
-    elif name == 'mlp':
-        classifier = MLPClassifier(hidden_layer_sizes=(int(params['param1']),), max_iter=int(params['param2']))
-    elif name == 'dt':
-        classifier = DecisionTreeClassifier(max_depth=int(params['param1']))
-    elif name == 'rf':
-        classifier = RandomForestClassifier(n_estimators=int(params['param1']))
+def obter_classificador(nome, params):
+    # Implementa a lógica para inicializar o classificador com os parâmetros
+    if nome == 'knn':
+        classificador = KNeighborsClassifier(n_neighbors=int(params['parametro1']))
+    elif nome == 'svm':
+        classificador = SVC(C=float(params['parametro1']), kernel=params['parametro2'])
+    elif nome == 'mlp':
+        classificador = MLPClassifier(hidden_layer_sizes=(int(params['parametro1']),), max_iter=int(params['parametro2']))
+    elif nome == 'dt':
+        classificador = DecisionTreeClassifier(max_depth=int(params['parametro1']))
+    elif nome == 'rf':
+        classificador = RandomForestClassifier(n_estimators=int(params['parametro1']))
 
-    return classifier
+    return classificador
 
-
-def plot_confusion_matrix(cm, classes):
+def plotar_matriz_confusao(matriz_confusao, classes):
     plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=classes, yticklabels=classes)
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    plt.title('Confusion Matrix')
-    # plt.savefig('static/conf_photos/confusion_matrix.png')
+    sns.heatmap(matriz_confusao, annot=True, fmt='d', cmap='Blues', xticklabels=classes, yticklabels=classes)
+    plt.xlabel('Previsto')
+    plt.ylabel('Real')
+    plt.title('Matriz de Confusão')
+    # plt.savefig('static/conf_photos/matriz_confusao.png')
 
-    # Verifique se o diretório 'static/conf_photos' existe, senão crie
-    conf_photos_dir = 'static/conf_photos'
-    if not os.path.exists(conf_photos_dir):
-        os.makedirs(conf_photos_dir)
+    # Verifica se o diretório 'static/conf_photos' existe, senão cria
+    diretorio_conf_photos = 'static/conf_photos'
+    if not os.path.exists(diretorio_conf_photos):
+        os.makedirs(diretorio_conf_photos)
 
-    # Salve a matriz de confusão no diretório 'static/conf_photos' com um nome específico
-    plt.savefig(os.path.join(conf_photos_dir, 'confusion_matrix.png'))
+    # Salva a matriz de confusão no diretório 'static/conf_photos' com um nome específico
+    plt.savefig(os.path.join(diretorio_conf_photos, 'matriz_confusao.png'))
 
-def plot_to_base64():
+def plotar_para_base64():
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
     img_str = base64.b64encode(img.read()).decode()
     return img_str
 
-
-@app.route('/download_confusion_matrix')
-def download_confusion_matrix():
-    # return send_file('static/conf_photos/confusion_matrix.png', as_attachment=True, mimetype='image/png')
-    conf_photos_dir = os.path.join(current_app.root_path, 'static', 'conf_photos')
-    file_path = os.path.join(conf_photos_dir, 'confusion_matrix.png')
-    return send_file(file_path, as_attachment=True, mimetype='image/png')
+@app.route('/download_matriz_confusao')
+def download_matriz_confusao():
+    # return send_file('static/conf_photos/matriz_confusao.png', as_attachment=True, mimetype='image/png')
+    diretorio_conf_photos = os.path.join(current_app.root_path, 'static', 'conf_photos')
+    caminho_arquivo = os.path.join(diretorio_conf_photos, 'matriz_confusao.png')
+    return send_file(caminho_arquivo, as_attachment=True, mimetype='image/png')

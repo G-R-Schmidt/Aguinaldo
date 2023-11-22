@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Learning Results</title>
+    <title>Resultados de Aprendizado de Máquina</title>
 </head>
 <body>
-    <h1>Machine Learning Results</h1>
-    <p>Accuracy: {{ accuracy }}</p>
-    <p>Precision: {{ precision }}</p>
+    <h1>Resultados de Aprendizado de Máquina</h1>
+    <p>Acurácia: {{ acuracia }}</p>
+    <p>Precisão: {{ precisao }}</p>
     <p>Recall: {{ recall }}</p>
-    <p>F1 Score: {{ f1 }}</p>
-    <img src="data:image/png;base64,{{ image }}" alt="Confusion Matrix">
-    <a href="/download_confusion_matrix">Download Confusion Matrix</a>
+    <p>Pontuação F1: {{ f1 }}</p>
+    <img src="data:image/png;base64,{{ imagem }}" alt="Matriz de Confusão">
+    <a href="/download_matriz_confusao">Download Matriz de Confusão</a>
 </body>
 </html>

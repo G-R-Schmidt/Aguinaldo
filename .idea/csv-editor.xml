@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="CsvFileAttributes">
-    <option name="attributeMap">
-      <map>
-        <entry key="C:\Users\athos\Downloads\Most_Visited_Destination_in_2018_and_2019.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\src\static\data\Most_Visited_Destination_in_2018_and_2019.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-      </map>
-    </option>
+  <component name="ConfiguracaoCsvEditor">
+    <!-- Mapeia as configurações de atributos para arquivos CSV -->
+    <opcao nome="mapaAtributos">
+      <mapa>
+        <!-- Configurações para o arquivo no diretório do usuário -->
+        <entrada chave="C:\Users\nomeusuario\Downloads\Arquivo.csv">
+          <valor>
+            <Atributo>
+              <!-- Define a vírgula como separador para este arquivo -->
+              <opcao nome="separador" valor="," />
+            </Atributo>
+          </valor>
+        </entrada>
+        <!-- Configurações para o arquivo no diretório do projeto -->
+        <entrada chave="\src\static\data\Arquivo.csv">
+          <valor>
+            <Atributo>
+              <!-- Define a vírgula como separador para este arquivo -->
+              <opcao nome="separador" valor="," />
+            </Atributo>
+          </valor>
+        </entrada>
+      </mapa>
+    </opcao>
   </component>
 </project>

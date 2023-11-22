@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ML Web App</title>
+    <title>Aplicativo Web de Aprendizado de Máquina</title>
 </head>
 <body>
-    <h1>Machine Learning Web App</h1>
-    <form method="POST" action="/train">
+    <h1>Aplicativo Web de Aprendizado de Máquina</h1>
+    <form method="POST" action="/treinar">
         {{ form.hidden_tag() }}
         {{ form.csrf_token }}
 
-        <label for="classifier">Escolha o Classificador:</label>
-        <select name="classifier" id="classifier">
+        <label for="classificador">Escolha o Classificador:</label>
+        <select name="classificador" id="classificador">
             <option value="knn">KNN</option>
             <option value="svm">SVM</option>
             <option value="mlp">MLP</option>
@@ -20,20 +20,20 @@
             <option value="rf">Random Forest</option>
         </select>
 
-        {{ form.param1.label }} {{ form.param1 }}
-        {{ form.param2.label }} {{ form.param2 }}
-        {{ form.param3.label }} {{ form.param3 }}
+        {{ form.parametro1.label }} {{ form.parametro1 }}
+        {{ form.parametro2.label }} {{ form.parametro2 }}
+        {{ form.parametro3.label }} {{ form.parametro3 }}
 
-        {{ form.submit }}
+        {{ form.enviar }}
 
-        {% if result %}
+        {% if resultado %}
             <h2>Resultados:</h2>
-            <p>Acurácia: {{ result.accuracy }}</p>
-            <p>Precisão: {{ result.precision }}</p>
-            <p>Recall: {{ result.recall }}</p>
-            <p>F1-Score: {{ result.f1 }}</p>
-            <img src="data:image/png;base64,{{ result.image }}" alt="Matriz de Confusão">
-            <a href="/download_confusion_matrix" download>Download Matriz de Confusão</a>
+            <p>Acurácia: {{ resultado.acuracia }}</p>
+            <p>Precisão: {{ resultado.precisao }}</p>
+            <p>Recall: {{ resultado.recall }}</p>
+            <p>F1-Score: {{ resultado.f1 }}</p>
+            <img src="data:image/png;base64,{{ resultado.imagem }}" alt="Matriz de Confusão">
+            <a href="/download_matriz_confusao" download>Download Matriz de Confusão</a>
         {% endif %}
     </form>
 </body>

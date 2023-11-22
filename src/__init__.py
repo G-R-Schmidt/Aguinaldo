@@ -1,13 +1,17 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-
+# Inicializa a aplicação Flask
 app = Flask(__name__, static_url_path='/static')
 app.static_folder = 'static'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comunidade.db'
-app.config['SECRET_KEY'] = 'p2312opdj31hd013jn'
-app.config['UPLOAD_FOLDER'] = 'static/photos_posts'
 
-database = SQLAlchemy(app)
+# Configurações do banco de dados SQLite
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///projeto_novo.db'
+app.config['SECRET_KEY'] = 'chave_secreta_123'
+app.config['UPLOAD_FOLDER'] = 'static/fotos_posts'
 
-from src import routes
+# Inicializa a extensão SQLAlchemy
+banco_de_dados = SQLAlchemy(app)
+
+# Importa as rotas do módulo src
+from src import rotas

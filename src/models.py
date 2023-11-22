@@ -1,14 +1,14 @@
-from src import database
+from src import banco_de_dados
 
-class MLModel(db.Model):
-    id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(100), nullable=False)
-    parameters = database.Column(database.String(100), nullable=False)
-    accuracy = database.Column(database.Float, nullable=False)
-    precision = database.Column(database.Float, nullable=False)
-    recall = database.Column(database.Float, nullable=False)
-    f1 = database.Column(database.Float, nullable=False)
-    date_created = database.Column(database.DateTime, default=database.func.current_timestamp())
+class ModeloML(banco_de_dados.Model):
+    id = banco_de_dados.Column(banco_de_dados.Integer, primary_key=True)
+    nome = banco_de_dados.Column(banco_de_dados.String(100), nullable=False)
+    parametros = banco_de_dados.Column(banco_de_dados.String(100), nullable=False)
+    acuracia = banco_de_dados.Column(banco_de_dados.Float, nullable=False)
+    precisao = banco_de_dados.Column(banco_de_dados.Float, nullable=False)
+    recall = banco_de_dados.Column(banco_de_dados.Float, nullable=False)
+    f1 = banco_de_dados.Column(banco_de_dados.Float, nullable=False)
+    data_criacao = banco_de_dados.Column(banco_de_dados.DateTime, default=banco_de_dados.func.current_timestamp())
 
     def __repr__(self):
-        return f"MLModel('{self.name}', '{self.parameters}', '{self.date_created}')"
+        return f"ModeloML('{self.nome}', '{self.parametros}', '{self.data_criacao}')"

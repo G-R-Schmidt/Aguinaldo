@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module type="PYTHON_MODULE" version="4">
-  <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/venv" />
-    </content>
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
-  </component>
-</module>
+<modulo tipo="MODULO_PYTHON" versao="4">
+  <componente nome="NovoGerenciadorRaizModulo">
+    <conteudo url="file://$MODULE_DIR$">
+      <!-- Exclui a pasta venv do conteúdo do módulo -->
+      <excluirPasta url="file://$MODULE_DIR$/venv" />
+    </conteudo>
+    <entradaOrdem tipo="jdkHerdado" />
+    <entradaOrdem tipo="pastaFonte" paraTestes="false" />
+  </componente>
+</modulo>

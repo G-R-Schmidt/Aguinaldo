@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Black">
-    <option name="sdkName" value="Python 3.11 (projetoFinal)" />
-  </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (projetoFinal)" project-jdk-type="Python SDK" />
-  <component name="PyCharmProfessionalAdvertiser">
-    <option name="shown" value="true" />
-  </component>
-</project>
+  <componente nome="ConfiguracaoBlack">
+    <!-- Configuração do SDK para o Black -->
+    <opcao nome="nomeSdk" valor="Python 3.11 (ProjetoReformulado)" />
+  </componente>
+  <componente nome="GerenciadorRaizProjeto" versao="2" projeto-nome-jdk="Python 3.11 (ProjetoReformulado)" projeto-tipo-jdk="Python SDK" />
+  <componente nome="AnunciantePyCharmProfissional">
+    <!-- Indica que o anúncio do PyCharm Professional foi exibido -->
+    <opcao nome="exibido" valor="true" />
+  </componente>
+</projecto>
