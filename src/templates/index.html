@@ -6,14 +6,35 @@
     <title>ML Web App</title>
 </head>
 <body>
-<h1>Machine Learning Web App</h1>
+    <h1>Machine Learning Web App</h1>
     <form method="POST" action="/train">
         {{ form.hidden_tag() }}
         {{ form.csrf_token }}
-        {{ form.classifier.label }} {{ form.classifier }}
+
+        <label for="classifier">Escolha o Classificador:</label>
+        <select name="classifier" id="classifier">
+            <option value="knn">KNN</option>
+            <option value="svm">SVM</option>
+            <option value="mlp">MLP</option>
+            <option value="dt">Decision Tree</option>
+            <option value="rf">Random Forest</option>
+        </select>
+
         {{ form.param1.label }} {{ form.param1 }}
         {{ form.param2.label }} {{ form.param2 }}
+        {{ form.param3.label }} {{ form.param3 }}
+
         {{ form.submit }}
+
+        {% if result %}
+            <h2>Resultados:</h2>
+            <p>Acurácia: {{ result.accuracy }}</p>
+            <p>Precisão: {{ result.precision }}</p>
+            <p>Recall: {{ result.recall }}</p>
+            <p>F1-Score: {{ result.f1 }}</p>
+            <img src="data:image/png;base64,{{ result.image }}" alt="Matriz de Confusão">
+            <a href="/download_confusion_matrix" download>Download Matriz de Confusão</a>
+        {% endif %}
     </form>
 </body>
 </html>

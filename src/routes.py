@@ -1,6 +1,9 @@
+import os
+
 import pandas as pd
 
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, current_app
+from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
@@ -15,24 +18,23 @@ from io import BytesIO
 import base64
 
 from src import app
+from src.forms import MLForm
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    form = MLForm()  # Crie uma instância do formulário
+    return render_template('index.html', form=form)
 
 @app.route('/train', methods=['POST'])
 def train():
     classifier_name = request.form.get('classifier')
-    parameters = get_parameters(request.form)
+    parameters = get_parameters(request.form, classifier_name)
 
-    # Carregue seu conjunto de dados aqui
-    dataset_path = 'static/data/Most_Visited_Destination_in_2018_and_2019.csv'
-    dataset = pd.read_csv(dataset_path)
-
-    # Supondo que as features estão em colunas específicas, ajuste conforme necessário
-    X = dataset.iloc[:, :-1]  # Todas as colunas, exceto a última (assumindo que a última é a coluna de rótulos)
-    y = dataset.iloc[:, -1]  # A última coluna é a coluna de rótulos
+    # Carregue o conjunto de dados Iris
+    iris = datasets.load_iris()
+    X = iris.data
+    y = iris.target
 
     # Divida o conjunto de dados em treino e teste
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -53,22 +55,56 @@ def train():
     f1 = f1_score(y_test, y_pred, average='macro')
 
     # Crie a matriz de confusão
-    classes = dataset['target_column'].unique()  # Substitua 'target_column' pelo nome da coluna de rótulos
+    classes = iris.target_names.tolist()
     cm = confusion_matrix(y_test, y_pred)
     plot_confusion_matrix(cm, classes)
 
     # Converta a imagem para uma string base64
     image_str = plot_to_base64()
 
-    return render_template('result.html', accuracy=accuracy, precision=precision, recall=recall, f1=f1, image=image_str)
-def get_parameters(form_data):
-    # Implemente a lógica para extrair os parâmetros do formulário
-    classifier_name = form_data.get('classifier')
-    param1 = form_data.get('param1')
-    param2 = form_data.get('param2')
+    result = {
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1,
+        'image': image_str,
+        'confusion_matrix_path': 'static/conf_photos/confusion_matrix.png'
+    }
 
-    # Retorne os parâmetros como um dicionário
-    return {'param1': param1, 'param2': param2}
+    return render_template('index.html', form=MLForm(), result=result)
+def get_parameters(form_data, classifier_name):
+    # Implemente a lógica para extrair os parâmetros do formulário
+    params = {}
+    for i in range(1, 4):  # Assumindo que você tem até 3 parâmetros, ajuste conforme necessário
+        param_key = f'param{i}'
+        param_value = form_data.get(param_key)
+        params[param_key] = param_value
+
+    # Lógica específica para cada classificador
+    if classifier_name == 'knn':
+        # Adicione lógica específica para KNN
+        params['n_neighbors'] = int(params.get('param1'))
+        params['weights'] = params.get('param2')
+
+    elif classifier_name == 'svm':
+        # Adicione lógica específica para SVM
+        params['C'] = float(params.get('param1'))
+        params['kernel'] = params.get('param2')
+
+    elif classifier_name == 'mlp':
+        # Adicione lógica específica para MLP
+        params['hidden_layer_size'] = int(params.get('param1'))
+        params['max_iter'] = int(params.get('param2'))
+
+    elif classifier_name == 'dt':
+        # Adicione lógica específica para Decision Tree
+        params['max_depth'] = int(params.get('param1'))
+
+    elif classifier_name == 'rf':
+        # Adicione lógica específica para Random Forest
+        params['n_estimators'] = int(params.get('param1'))
+
+    return params
 
 def get_classifier(name, params):
     # Implemente a lógica para inicializar o classificador com os parâmetros
@@ -92,7 +128,15 @@ def plot_confusion_matrix(cm, classes):
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
     plt.title('Confusion Matrix')
-    plt.savefig('static/confusion_matrix.png')
+    # plt.savefig('static/conf_photos/confusion_matrix.png')
+
+    # Verifique se o diretório 'static/conf_photos' existe, senão crie
+    conf_photos_dir = 'static/conf_photos'
+    if not os.path.exists(conf_photos_dir):
+        os.makedirs(conf_photos_dir)
+
+    # Salve a matriz de confusão no diretório 'static/conf_photos' com um nome específico
+    plt.savefig(os.path.join(conf_photos_dir, 'confusion_matrix.png'))
 
 def plot_to_base64():
     img = BytesIO()
@@ -104,4 +148,7 @@ def plot_to_base64():
 
 @app.route('/download_confusion_matrix')
 def download_confusion_matrix():
-    return send_file('static/confusion_matrix.png', as_attachment=True)
+    # return send_file('static/conf_photos/confusion_matrix.png', as_attachment=True, mimetype='image/png')
+    conf_photos_dir = os.path.join(current_app.root_path, 'static', 'conf_photos')
+    file_path = os.path.join(conf_photos_dir, 'confusion_matrix.png')
+    return send_file(file_path, as_attachment=True, mimetype='image/png')
